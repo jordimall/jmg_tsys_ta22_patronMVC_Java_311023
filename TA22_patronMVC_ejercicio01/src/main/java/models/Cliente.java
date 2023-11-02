@@ -97,5 +97,4 @@ public class Cliente {
 	public void setFecha(String fecha) {
 		this.fecha = fecha;
 	}
-
 }
