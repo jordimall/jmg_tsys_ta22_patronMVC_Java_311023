@@ -1,44 +1,32 @@
 package views;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.JButton;
-import javax.swing.JTable;
 import java.awt.Font;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
 
 public class ViewPrincipal extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTable table;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ViewPrincipal frame = new ViewPrincipal();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	public JButton añadirCliente;
+	public JButton editarCliente;
+	public JButton eliminarCliente;
+	public JButton mostrarClientes;
+	public JTable table;
+	public JScrollPane scrollPane;
 
 	/**
 	 * Create the frame.
 	 */
 	public ViewPrincipal() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -47,16 +35,18 @@ public class ViewPrincipal extends JFrame {
 		
 		JLabel lblNewLabel = new JLabel("Ejercicio 1");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		lblNewLabel.setBounds(105, 0, 220, 50);
+		lblNewLabel.setBounds(340, 0, 220, 50);
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		contentPane.add(lblNewLabel);
 		
-		JButton añadirCliente = new JButton("A\u00F1adir Cliente");
-		añadirCliente.setBounds(162, 61, 110, 25);
+		añadirCliente = new JButton("A\u00F1adir Cliente");
+		añadirCliente.setBounds(375, 61, 150, 25);
 		contentPane.add(añadirCliente);
 		
 		table = new JTable();
-		table.setBounds(0, 97, 434, 164);
-		contentPane.add(table);
+		table.setBounds(10, 97, 500, 153);
+		scrollPane = new JScrollPane(table);
+		scrollPane.setBounds(10, 97, 860, 450);
+	    contentPane.add(scrollPane);
 	}
 }
