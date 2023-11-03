@@ -10,18 +10,20 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JTextField;
+import javax.swing.JFormattedTextField;
 
 
 public class ViewPrincipal extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	public JButton añadirCliente;
+	public JButton añadirRegistro;
 	public JButton editarCliente;
 	public JButton eliminarCliente;
 	public JButton mostrarClientes;
-	public JTable table;
-	public JScrollPane scrollPane;
+	public ViewMostrarRegistros contentPaneRegistros;
+	public ViewForm contentPaneForm;
 
 	/**
 	 * Create the frame.
@@ -39,14 +41,23 @@ public class ViewPrincipal extends JFrame {
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		contentPane.add(lblNewLabel);
 		
-		añadirCliente = new JButton("A\u00F1adir Cliente");
-		añadirCliente.setBounds(375, 61, 150, 25);
-		contentPane.add(añadirCliente);
+		añadirRegistro = new JButton("A\u00F1adir Registro");
+		añadirRegistro.setBounds(375, 61, 150, 25);
+		contentPane.add(añadirRegistro);
 		
-		table = new JTable();
-		table.setBounds(10, 97, 500, 153);
-		scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(10, 97, 860, 450);
-	    contentPane.add(scrollPane);
+		contentPaneRegistros = new ViewMostrarRegistros();
+		contentPaneRegistros.scrollPane.setSize(450, 430);
+		contentPaneRegistros.scrollPane.setLocation(10, 10);
+		contentPaneRegistros.setBounds(0, 90, 470, 450);
+		contentPaneRegistros.setVisible(true);
+	    contentPane.add(contentPaneRegistros);
+	    
+	    contentPaneForm = new ViewForm();
+		contentPaneForm.setSize(300, 430);
+		contentPaneForm.setLocation(500, 90);
+		contentPaneForm.setVisible(true);
+		contentPane.add(contentPaneForm);
+	    
+	   
 	}
 }
