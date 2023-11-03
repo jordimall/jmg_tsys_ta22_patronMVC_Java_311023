@@ -122,13 +122,13 @@ public class MySQL {
 	public boolean insertsData(String db, String nameTabla, String insert) {
 		try {
 			useDatabase(db);
-
-			String query = "INSERT INTO " + nameTabla + " (" + consegirColumnas(db, nameTabla) + ") VALUES " + insert
-					+ ";";
+			String query = "INSERT INTO " + nameTabla + " (" + consegirColumnas(db, nameTabla) + ") VALUES (" + insert
+					+ ");";
 			Statement st = this.conexion.createStatement();
 			st.executeUpdate(query);
 			return true;
 		} catch (SQLException e) {
+			
 			System.out.println(e.getMessage());
 			return false;
 		}

@@ -97,4 +97,12 @@ public class Cliente {
 	public void setFecha(String fecha) {
 		this.fecha = fecha;
 	}
+
+	@Override
+	public String toString() {
+		return "\""+nombre + "\", \"" + apellido + "\", \"" + direccion
+				+ "\", " + dni + ", \"" + fecha+ "\"";
+	}
+	
+	
 }

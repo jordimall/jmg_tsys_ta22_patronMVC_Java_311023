@@ -27,8 +27,10 @@ public class UtilsMysql {
     }
 
 	public String iniciarSessionBaseDatos() {
+
 		boolean conexion = mysql.connectionSQL(user.getPassword(), user.getUserName(), dataBase);
 		String message = "";
+
 		if (conexion) {
 			message = "Conectado a la base de datos: " + dataBase;
 		} else {
