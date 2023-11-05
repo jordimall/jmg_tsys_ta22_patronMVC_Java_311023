@@ -53,11 +53,11 @@ public class Proyecto {
 		Horas = horas;
 	}
 
-	public String toStringAD() {
+	public String toStringAdd() {
 		return "\"" + Id + "\", \"" + Nombre + "\", " + Horas;
 	}
 
-	public String toString() {
+	public String toStringUpdate() {
 		return "Id=\"" + Id + "\", Nombre=\"" + Nombre + "\", Horas=" + Horas;
 	}
 

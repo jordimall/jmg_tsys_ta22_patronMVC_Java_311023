@@ -39,7 +39,7 @@ public class Asignado_a {
 	}
 	
 	
-	public String toString() {
+	public String toStringUpdate() {
 		return "Cientifico=\"" + Cientifico + "\", Proyecto=\"" + Proyecto + "\"";
 	}
 	

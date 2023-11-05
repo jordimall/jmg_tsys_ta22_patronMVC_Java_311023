@@ -17,8 +17,8 @@ public class ViewPrincipal extends JFrame {
 	public JButton añadirRegistro;
 	public JButton editarRegistro;
 	public JButton eliminarRegistro;
-	public JButton btnvideos;
 	public JButton btnCliente;
+	public JButton btnvideos;
 	public JLabel lblTabla;
 	public ViewMostrarRegistros contentPaneRegistros;
 	public ViewForm contentPaneForm;
@@ -39,7 +39,7 @@ public class ViewPrincipal extends JFrame {
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		contentPane.add(lblNewLabel);
 		
-		lblTabla = new JLabel("Tabla Cliente");
+		lblTabla = new JLabel("Tabla Clientes");
 		lblTabla.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTabla.setBounds(37, 11, 140, 25);
 		contentPane.add(lblTabla);

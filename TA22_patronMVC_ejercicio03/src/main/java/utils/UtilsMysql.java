@@ -95,8 +95,9 @@ public class UtilsMysql {
 	public <T> List<T> RecuperarTodosLosDatos(String tabla, Class<T> type) {
 		List<T> results = new ArrayList<>();
 		iniciarSessionBaseDatos();
+		
 		ResultSet resultSet = mysql.getValues(this.dataBase, tabla);
-
+		
 		try {
 
 			ResultSetMetaData metaData = resultSet.getMetaData();
@@ -145,6 +146,7 @@ public class UtilsMysql {
 
 		try {
 			ResultSetMetaData metaData = resultSet.getMetaData();
+			
 			int numColumnas = metaData.getColumnCount();
 
 			while (resultSet.next()) {
