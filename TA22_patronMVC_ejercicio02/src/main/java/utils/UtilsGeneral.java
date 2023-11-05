@@ -5,6 +5,7 @@ package utils;
 
 import java.text.SimpleDateFormat;
 
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
@@ -40,6 +41,9 @@ public class UtilsGeneral {
 				JDateChooser dateChooser = (JDateChooser) componente;
 				SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd");
 				array[i] = formatoFecha.format(dateChooser.getDate());
+			} else if(componente instanceof JComboBox<?>) {
+				JComboBox<?> combo = (JComboBox<?>) componente;
+				array[i] = (String) combo.getSelectedItem();
 			}
 			i++;
 		}

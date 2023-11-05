@@ -13,8 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -22,84 +22,78 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
-import models.Cliente;
 import models.MySQL;
 import models.User;
+import models.Videos;
 import utils.UtilsGeneral;
 import utils.UtilsMysql;
 import utils.utilsValidatorsForm;
 import views.ViewPrincipal;
 
-public class ClienteController implements ActionListener {
-
-	private Cliente client;
+/**
+ * 
+ */
+public class VideosController {
+	private Videos videos;
 	private ViewPrincipal view;
 	private UtilsMysql mysql;
 	private utilsValidatorsForm validators = new utilsValidatorsForm();
 	private UtilsGeneral utg;
-	private String contentTable = "id INT(11) AUTO_INCREMENT, nombre VARCHAR(250) DEFAULT NULL, apellido VARCHAR(250) DEFAULT NULL, direccion VARCHAR(11) DEFAULT NULL,"
-			+ "dni INT(11) DEFAULT NULL, fecha DATE DEFAULT NULL, PRIMARY KEY (id)";
+	private String contentTable = "id INT(11) AUTO_INCREMENT, title VARCHAR(250) DEFAULT NULL,"
+			+ "director VARCHAR(250) DEFAULT NULL, cli_id INT(11) DEFAULT NULL, PRIMARY KEY (id),"
+			+ " CONSTRAINT videos_fk FOREIGN KEY (cli_id) REFERENCES cliente (id)";
 
 	/**
 	 * @param client
 	 * @param view
 	 */
-	public ClienteController(Cliente cliente, ViewPrincipal view, User user, MySQL mysql) {
-		this.client = cliente;
+	public VideosController(Videos videos, ViewPrincipal view, User user, MySQL mysql) {
+		this.videos = videos;
 		this.view = view;
 		this.utg = new UtilsGeneral(view);
 		this.mysql = new UtilsMysql(mysql, user);
-		this.mysql.crearBaseDatos();
-		this.mysql.crearTabla("cliente", contentTable);
-		this.view.añadirRegistro.addActionListener(añadir);
-		this.view.editarRegistro.addActionListener(editar);
-		this.view.eliminarRegistro.addActionListener(eliminar);
-		this.view.btnCliente.addActionListener(modificarTablaForm);
-
 	}
 
-	public void iniciarVista() {
-		view.setTitle("Ejercicio 1");
-		view.setBounds(100, 100, 900, 600);
-		view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		view.setLocationRelativeTo(null);
-		mysql.iniciarSessionBaseDatos();
-		crearTabla();
-		crearFormulario();
-		view.setVisible(true);
+	public void iniciarController() {
+		this.mysql.crearBaseDatos();
+		this.mysql.crearTabla("videos", contentTable);
+		this.view.btnvideos.addActionListener(modificarTablaForm);
 	}
 
 	private void crearTabla() {
 		crearColumnas();
-		mostrarClientes();
+		mostrarRegistro();
 	}
 
 	private void crearColumnas() {
 
-		String columnas[] = recuperarCamposTabla("cliente");
+		String columnas[] = recuperarCamposTabla("videos");
 		DefaultTableModel model = new DefaultTableModel();
 
 		for (int i = 0; i < columnas.length; i++) {
 			if (columnas[i] != null) {
-				model.addColumn(columnas[i]);
+				if (columnas[i].equals("cli_id")) {
+					model.addColumn("cliente");
+				} else {
+					model.addColumn(columnas[i]);
+				}
 			}
 		}
 		view.contentPaneRegistros.table.setModel(model);
 	}
 
-	private void mostrarClientes() {
+	private void mostrarRegistro() {
 		@SuppressWarnings("unchecked")
-		List<Cliente> clientes = (List<Cliente>) mysql.RecuperarTodosLosDatos("cliente", client.getClass());
+		List<Videos> videos = (List<Videos>) mysql.RecuperarTodosLosDatos("videos", this.videos.getClass());
 		DefaultTableModel model = (DefaultTableModel) view.contentPaneRegistros.table.getModel();
-		for (Cliente cliente : clientes) {
-			Object[] rowData = { cliente.getId(), cliente.getNombre(), cliente.getApellido(), cliente.getDireccion(),
-					cliente.getDni(), cliente.getFecha() };
+		for (Videos video : videos) {
+			Object[] rowData = { video.getId(), video.getTitle(), video.getDirector(), video.getCli_id() };
 			model.addRow(rowData);
 		}
 	}
 
 	private void crearFormulario() {
-		String campos[] = recuperarCamposTabla("cliente");
+		String campos[] = recuperarCamposTabla("videos");
 
 		view.contentPaneForm.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -111,10 +105,13 @@ public class ClienteController implements ActionListener {
 			if (campo != null) {
 				JLabel label = new JLabel(campo);
 
-				if (campo.equals("fecha")) {
-					JDateChooser dateChooser = new JDateChooser();
-					dateChooser.setDateFormatString("yyyy-MM-dd");
-					component = dateChooser;
+				if (campo.equals("cli_id")) {
+					JComboBox<String> combo = new JComboBox<String>();
+					List<String> valores = mysql.RecuperarTodosLosDatos("cliente", "id");
+					for (String valor : valores) {
+						combo.addItem(valor);
+					}
+					component = combo;
 				} else {
 					JTextField textField = new JTextField(20);
 					if (label.getText().equals("id")) {
@@ -140,7 +137,7 @@ public class ClienteController implements ActionListener {
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.CENTER;
 		view.contentPaneForm.add(view.contentPaneForm.botonGuardar, gbc);
-		
+		view.lblTabla.setText("Tabla Videos");
 		view.contentPaneForm.revalidate();
 		view.contentPaneForm.repaint();
 
@@ -151,56 +148,34 @@ public class ClienteController implements ActionListener {
 		return campos;
 	}
 
-	private Cliente crearCliente(String[] arrayList) {
-		Cliente cli = new Cliente();
+	private Videos crearVideo(String[] arrayList) {
+		Videos vid = new Videos();
 
 		if (!arrayList[0].isEmpty()) {
-			cli.setId(Integer.parseInt(arrayList[0]));
+			vid.setId(Integer.parseInt(arrayList[0]));
 		}
 
 		if (validators.validarMaxCaracteres(arrayList[1], 255) && validators.validarNoCadenaVacia(arrayList[1])) {
-			cli.setNombre(arrayList[1]);
+			vid.setTitle(arrayList[1]);
 		} else {
 			JOptionPane.showMessageDialog(view,
-					"Error al validar el nombre, el campo no ha de estar vació y a de tener un maximo de 255 caracteres");
+					"Error al validar el titulo, el campo no ha de estar vació y a de tener un maximo de 255 caracteres");
 			return null;
 		}
 
 		if (validators.validarMaxCaracteres(arrayList[2], 255) && validators.validarNoCadenaVacia(arrayList[2])) {
-			cli.setApellido(arrayList[2]);
+			vid.setDirector(arrayList[2]);
 		} else {
 			JOptionPane.showMessageDialog(view,
-					"Error al validar los apellidos, el campo no ha de estar vació y a de tener un maximo de 255 caracteres");
+					"Error al validar el director, el campo no ha de estar vació y a de tener un maximo de 255 caracteres");
 			return null;
 		}
 
-		if (validators.validarMaxCaracteres(arrayList[3], 11) && validators.validarNoCadenaVacia(arrayList[3])) {
-			cli.setDireccion(arrayList[3]);
-		} else {
-			JOptionPane.showMessageDialog(view,
-					"Error al validar la dirección, el campo no ha de estar vació y a de tener un maximo de 11 caracteres");
-			return null;
-		}
+		vid.setCli_id(Integer.parseInt(arrayList[3]));
 
-		if (validators.validarMaxCaracteres(arrayList[4], 11) && validators.validarNumero(arrayList[4])
-				&& validators.validarNoCadenaVacia(arrayList[4])) {
-			cli.setDni(Integer.parseInt(arrayList[4]));
-		} else {
-			JOptionPane.showMessageDialog(view,
-					"Error al validar el DNI, el campo no ha de estar vació y a de ser un número entero");
-			return null;
-		}
-
-		if (validators.validarNoCadenaVacia(arrayList[5])) {
-			cli.setFecha(arrayList[5]);
-		} else {
-			JOptionPane.showMessageDialog(view, "Error al validar la fecha, el campo no ha de estar vació");
-			return null;
-		}
-
-		return cli;
+		return vid;
 	}
-	
+
 	ActionListener modificarTablaForm = new ActionListener() {
 
 		@Override
@@ -217,8 +192,7 @@ public class ClienteController implements ActionListener {
 			view.editarRegistro.addActionListener(editar);
 			view.eliminarRegistro.removeActionListener(view.eliminarRegistro.getActionListeners()[0]);
 			view.eliminarRegistro.addActionListener(eliminar);
-			view.lblTabla.setText("Tabla Cliente");
-			
+
 			view.validate();
 			view.repaint();
 
@@ -236,7 +210,7 @@ public class ClienteController implements ActionListener {
 					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
 			view.contentPaneForm.botonGuardar.setText("Guardar");
 			view.contentPaneForm.botonGuardar.addActionListener(insertarRegistro);
-			utg.desbloquarFormulario(recuperarCamposTabla("cliente"));
+			utg.desbloquarFormulario(recuperarCamposTabla("videos"));
 
 			for (JComponent componente : view.contentPaneForm.componentes) {
 
@@ -256,13 +230,12 @@ public class ClienteController implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String arrayContenido[] = utg.agruparContenido();
-			Cliente cli = crearCliente(arrayContenido);
+			Videos vid = crearVideo(arrayContenido);
 
-			if (cli != null) {
-				mysql.insertarDatos("cliente", cli.toStringAdd());
+			if (vid != null) {
+				mysql.insertarDatos("videos", vid.toStringAdd());
 				crearTabla();
 				utg.limpiarCampos();
-				cli = null;
 			} else {
 				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
 			}
@@ -281,7 +254,7 @@ public class ClienteController implements ActionListener {
 						.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
 				view.contentPaneForm.botonGuardar.setText("editar");
 				view.contentPaneForm.botonGuardar.addActionListener(editarRegistro);
-				utg.desbloquarFormulario(recuperarCamposTabla("cliente"));
+				utg.desbloquarFormulario(recuperarCamposTabla("videos"));
 
 				int i = 0;
 				for (JComponent componente : view.contentPaneForm.componentes) {
@@ -320,14 +293,14 @@ public class ClienteController implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String arrayContenido[] = utg.agruparContenido();
-			Cliente cli = crearCliente(arrayContenido);
+			Videos vis = crearVideo(arrayContenido);
 
-			if (cli != null) {
-				String condition = "id=" + cli.getId();
-				mysql.actualizarDatos("cliente", cli.toStringUpdate(), condition);
+			if (vis != null) {
+				String condition = "id=" + vis.getId();
+				mysql.actualizarDatos("videos", vis.toStringUpdate(), condition);
 				crearTabla();
 				utg.limpiarCampos();
-				cli = null;
+				vis = null;
 			} else {
 				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
 			}
@@ -385,28 +358,21 @@ public class ClienteController implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String arrayContenido[] = utg.agruparContenido();
-			Cliente cli = crearCliente(arrayContenido);
+			Videos vid = crearVideo(arrayContenido);
 			int opcion = JOptionPane.showConfirmDialog(null, "¿Deseas eliminar el registro?", "Confirmación",
 					JOptionPane.YES_NO_OPTION);
 			boolean respuestaUsuario = opcion == JOptionPane.YES_OPTION;
 
-			if (cli != null && respuestaUsuario) {
-				String condition = "id=" + cli.getId();
-				mysql.eliminarDatos("cliente", condition);
+			if (vid != null && respuestaUsuario) {
+				String condition = "id=" + vid.getId();
+				mysql.eliminarDatos("videos", condition);
 				crearTabla();
 				utg.limpiarCampos();
-				cli = null;
+				vid = null;
 			} else {
 				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
 			}
 
 		}
 	};
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

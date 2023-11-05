@@ -74,7 +74,7 @@ public class Videos {
 	}
 
 	public String toStringUpdate() {
-		return "title=" + title + ", director=" + director + ", cli_id=" + cli_id;
+		return "title=\"" + title + "\", director=\"" + director + "\", cli_id=" + cli_id;
 	}
 
 }
