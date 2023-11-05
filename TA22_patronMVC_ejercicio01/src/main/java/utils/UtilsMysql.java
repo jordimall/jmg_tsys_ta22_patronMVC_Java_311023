@@ -25,89 +25,57 @@ public class UtilsMysql {
 		this.mysql = mySQL;
 		this.user = user;
 	}
-
-	public String iniciarSessionBaseDatos() {
-
-		boolean conexion = mysql.connectionSQL(user.getPassword(), user.getUserName(), dataBase);
-		String message = "";
-
-		if (conexion) {
-			message = "Conectado a la base de datos: " + dataBase;
-		} else {
-			message = "Error al conectarse a la base de datos";
-		}
-		return message;
+	
+	public void iniciarSession() {
+		mysql.connectionSQL(user.getPassword(), user.getUserName());
 	}
 
-	public String crearBaseDatos(String nameDatabase) {
-		boolean condition = mysql.createDB(nameDatabase);
-		String message = "";
-		if (condition) {
-			message = "Base de datos " + nameDatabase + " creada";
-		} else {
-			message = "Error al crear la base de datos " + nameDatabase;
-		}
+	public void iniciarSessionBaseDatos() {
 
-		return message;
+		mysql.connectionSQL(user.getPassword(), user.getUserName(), dataBase);
+
 	}
 
-	public String crearTabla(String nameTable, String contentTable) {
-		String message = "";
-		boolean condition = mysql.createTable(this.dataBase, nameTable, contentTable);
-		if (condition) {
-			message = "Tabla " + nameTable + " creada";
-		} else {
-			message = "Error al crear la tabla " + nameTable;
-		}
-		return message;
+	public void cerrarSesion() {
+
+		mysql.closeConnection();
+
 	}
 
-	public String insertarDatos(String nameTable, String contentInsert) {
-		String message = "";
-		boolean condition = mysql.insertsData(this.dataBase, nameTable, contentInsert);
-		if (condition) {
-			message = "Datos insertados correctamente";
-		} else {
-			message = "Error al insertar los datos";
-		}
-		return message;
+	public void crearBaseDatos(String nameDatabase) {
+		iniciarSessionBaseDatos();
+		mysql.createDB(nameDatabase);
+		cerrarSesion();
 	}
 
-	public String actualizarDatos(String nameTable, String contentUpdate, String conditionUpdate) {
-		String message = "";
-		boolean condition = mysql.update(dataBase, nameTable, contentUpdate, conditionUpdate);
-		if (condition) {
-			message = "Datos insertados correctamente";
-		} else {
-			message = "Error al insertar los datos";
-		}
-		return message;
+	public void crearTabla(String nameTable, String contentTable) {
+		iniciarSessionBaseDatos();
+		mysql.createTable(this.dataBase, nameTable, contentTable);
+		cerrarSesion();
 	}
 
-	public String eliminarDatos(String nameTable, String conditionDelete) {
-		String message = "";
-		boolean condition = mysql.deleteRecord(this.dataBase, nameTable, conditionDelete);
-		if (condition) {
-			message = "Datos eliminados correctamente";
-		} else {
-			message = "Error al eliminar los datos";
-		}
-		return message;
+	public void insertarDatos(String nameTable, String contentInsert) {
+		iniciarSessionBaseDatos();
+		mysql.insertsData(this.dataBase, nameTable, contentInsert);
+		cerrarSesion();
 	}
 
-	public String cerrarSesion() {
-		String message = "";
-		boolean condition = mysql.closeConnection();
-		if (condition) {
-			message = "Sessión cerrada";
-		} else {
-			message = "Error al cerrar sesión";
-		}
-		return message;
+	public void actualizarDatos(String nameTable, String contentUpdate, String conditionUpdate) {
+		iniciarSessionBaseDatos();
+		mysql.update(dataBase, nameTable, contentUpdate, conditionUpdate);
+		cerrarSesion();
+	}
+
+	public void eliminarDatos(String nameTable, String conditionDelete) {
+		iniciarSessionBaseDatos();
+		mysql.deleteRecord(this.dataBase, nameTable, conditionDelete);
+		cerrarSesion();
 	}
 
 	public String[] buscarColumnas(String tabla) {
+		iniciarSessionBaseDatos();
 		ResultSetMetaData metaData = mysql.recuperarColumnas(this.dataBase, tabla);
+		cerrarSesion();
 		try {
 
 			String columnas[] = new String[metaData.getColumnCount()];
@@ -127,9 +95,9 @@ public class UtilsMysql {
 
 	public <T> List<T> RecuperarTodosLosDatos(String tabla, Class<T> type) {
 		List<T> results = new ArrayList<>();
-
+		iniciarSessionBaseDatos();
 		ResultSet resultSet = mysql.getValues(dataBase, tabla);
-
+		cerrarSesion();
 		try {
 
 			ResultSetMetaData metaData = resultSet.getMetaData();
