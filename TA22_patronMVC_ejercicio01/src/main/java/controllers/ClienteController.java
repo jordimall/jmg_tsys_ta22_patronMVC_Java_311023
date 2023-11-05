@@ -26,6 +26,7 @@ import com.toedter.calendar.JDateChooser;
 import models.Cliente;
 import models.MySQL;
 import models.User;
+import utils.UtilsGeneral;
 import utils.UtilsMysql;
 import utils.utilsValidatorsForm;
 import views.ViewPrincipal;
@@ -36,6 +37,7 @@ public class ClienteController implements ActionListener {
 	private ViewPrincipal view;
 	private UtilsMysql mysql;
 	private utilsValidatorsForm validators = new utilsValidatorsForm();
+	private UtilsGeneral utg = new UtilsGeneral();
 
 	/**
 	 * @param client
@@ -135,185 +137,12 @@ public class ClienteController implements ActionListener {
 		view.contentPaneForm.add(view.contentPaneForm.botonGuardar, gbc);
 
 	}
-
+	
 	private String[] recuperarCamposTabla(String tabla) {
 		String campos[] = mysql.buscarColumnas(tabla);
 		return campos;
 	}
-
-	ActionListener añadir = new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			view.contentPaneForm.botonGuardar
-					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
-			view.contentPaneForm.botonGuardar.setText("guardar");
-			view.contentPaneForm.botonGuardar.addActionListener(insertarRegistro);
-			desbloquarFormulario();
-
-			for (JComponent componente : view.contentPaneForm.componentes) {
-
-				if (componente instanceof JTextField) {
-					JTextField textField = (JTextField) componente;
-					textField.setText("");
-				} else if (componente instanceof JDateChooser) {
-					JDateChooser dateChooser = (JDateChooser) componente;
-					dateChooser.setDate(null);
-				}
-			}
-		}
-	};
-
-	ActionListener insertarRegistro = new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			String arrayContenido[] = agruparContenido();
-			Cliente cli = crearCliente(arrayContenido);
-
-			if (cli != null) {
-				mysql.insertarDatos("cliente", cli.toStringAdd());
-				crearTabla();
-				limpiarCampos();
-				cli = null;
-			} else {
-				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
-			}
-		}
-	};
-
-	ActionListener editar = new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			view.contentPaneForm.botonGuardar
-					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
-			view.contentPaneForm.botonGuardar.setText("editar");
-			view.contentPaneForm.botonGuardar.addActionListener(editarRegistro);
-			desbloquarFormulario();
-
-			int filaSeleccionada = view.contentPaneRegistros.table.getSelectedRow();
-
-			if (filaSeleccionada != -1) {
-				int i = 0;
-				for (JComponent componente : view.contentPaneForm.componentes) {
-					if (componente instanceof JTextField) {
-						JTextField textField = (JTextField) componente;
-						String text = "";
-						if (view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i) instanceof Integer) {
-							text = Integer
-									.toString((int) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i));
-						} else {
-							text = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
-						}
-						textField.setText(text);
-					} else if (componente instanceof JDateChooser) {
-						JDateChooser dateChooser = (JDateChooser) componente;
-						SimpleDateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
-						String date = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
-						try {
-							dateChooser.setDate(formato.parse(date));
-						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
-					i++;
-				}
-
-			} else {
-				JOptionPane.showMessageDialog(view, "Ninguna fila seleccionada");
-			}
-		}
-	};
-
-	ActionListener editarRegistro = new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			String arrayContenido[] = agruparContenido();
-			Cliente cli = crearCliente(arrayContenido);
-
-			if (cli != null) {
-				String condition = "id=" + cli.getId();
-				mysql.actualizarDatos("cliente", cli.toStringUpdate(), condition);
-				crearTabla();
-				limpiarCampos();
-				cli = null;
-			} else {
-				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
-			}
-		}
-	};
-
-	ActionListener eliminar = new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			view.contentPaneForm.botonGuardar
-					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
-			view.contentPaneForm.botonGuardar.setText("eliminar");
-			view.contentPaneForm.botonGuardar.addActionListener(eliminarRegistro);
-			bloquerFormulario();
-
-			int filaSeleccionada = view.contentPaneRegistros.table.getSelectedRow();
-
-			if (filaSeleccionada != -1) {
-				int i = 0;
-				for (JComponent componente : view.contentPaneForm.componentes) {
-					if (componente instanceof JTextField) {
-						JTextField textField = (JTextField) componente;
-						String text = "";
-						if (view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i) instanceof Integer) {
-							text = Integer
-									.toString((int) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i));
-						} else {
-							text = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
-						}
-						textField.setText(text);
-					} else if (componente instanceof JDateChooser) {
-						JDateChooser dateChooser = (JDateChooser) componente;
-						SimpleDateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
-						String date = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
-						try {
-							dateChooser.setDate(formato.parse(date));
-						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
-					i++;
-				}
-
-			} else {
-				JOptionPane.showMessageDialog(view, "Ninguna fila seleccionada");
-			}
-		}
-	};
-
-	ActionListener eliminarRegistro = new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			String arrayContenido[] = agruparContenido();
-			Cliente cli = crearCliente(arrayContenido);
-			int opcion = JOptionPane.showConfirmDialog(null, "¿Deseas eliminar el registro?", "Confirmación",
-					JOptionPane.YES_NO_OPTION);
-			boolean respuestaUsuario = opcion == JOptionPane.YES_OPTION;
-
-			if (cli != null && respuestaUsuario) {
-				String condition = "id=" + cli.getId();
-				mysql.actualizarDatos("cliente", cli.toStringUpdate(), condition);
-				crearTabla();
-				limpiarCampos();
-				cli = null;
-			} else {
-				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
-			}
-
-		}
-	};
-
+	
 	private Cliente crearCliente(String[] arrayList) {
 		Cliente cli = new Cliente();
 
@@ -364,80 +193,178 @@ public class ClienteController implements ActionListener {
 		return cli;
 	}
 
-	private String[] agruparContenido() {
-		String array[] = new String[view.contentPaneForm.componentes.size()];
-		int i = 0;
-		for (JComponent componente : view.contentPaneForm.componentes) {
+	ActionListener añadir = new ActionListener() {
 
-			if (componente instanceof JTextField) {
-				JTextField textField = (JTextField) componente;
-				array[i] = textField.getText();
-			} else if (componente instanceof JDateChooser) {
-				JDateChooser dateChooser = (JDateChooser) componente;
-				SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd");
-				array[i] = formatoFecha.format(dateChooser.getDate());
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			view.contentPaneForm.botonGuardar
+					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
+			view.contentPaneForm.botonGuardar.setText("guardar");
+			view.contentPaneForm.botonGuardar.addActionListener(insertarRegistro);
+			utg.desbloquarFormulario(recuperarCamposTabla("cliente"));
+
+			for (JComponent componente : view.contentPaneForm.componentes) {
+
+				if (componente instanceof JTextField) {
+					JTextField textField = (JTextField) componente;
+					textField.setText("");
+				} else if (componente instanceof JDateChooser) {
+					JDateChooser dateChooser = (JDateChooser) componente;
+					dateChooser.setDate(null);
+				}
 			}
-			i++;
 		}
-		return array;
-	}
+	};
 
-	private void limpiarCampos() {
-		for (JComponent componente : view.contentPaneForm.componentes) {
+	ActionListener insertarRegistro = new ActionListener() {
 
-			if (componente instanceof JTextField) {
-				JTextField textField = (JTextField) componente;
-				textField.setText("");
-			} else if (componente instanceof JDateChooser) {
-				JDateChooser dateChooser = (JDateChooser) componente;
-				dateChooser.setDate(null);
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String arrayContenido[] = utg.agruparContenido();
+			Cliente cli = crearCliente(arrayContenido);
 
+			if (cli != null) {
+				mysql.insertarDatos("cliente", cli.toStringAdd());
+				crearTabla();
+				utg.limpiarCampos();
+				cli = null;
+			} else {
+				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
 			}
-
 		}
-	}
+	};
 
-	private void bloquerFormulario() {
-		for (JComponent componente : view.contentPaneForm.componentes) {
+	ActionListener editar = new ActionListener() {
 
-			if (componente instanceof JTextField) {
-				JTextField textField = (JTextField) componente;
-				textField.setEditable(false);
-			} else if (componente instanceof JDateChooser) {
-				JDateChooser dateChooser = (JDateChooser) componente;
-				dateChooser.setFocusable(false);
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			view.contentPaneForm.botonGuardar
+					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
+			view.contentPaneForm.botonGuardar.setText("editar");
+			view.contentPaneForm.botonGuardar.addActionListener(editarRegistro);
+			utg.desbloquarFormulario(recuperarCamposTabla("cliente"));
 
-			}
+			int filaSeleccionada = view.contentPaneRegistros.table.getSelectedRow();
 
-		}
-	}
-
-	private void desbloquarFormulario() {
-		String campos[] = recuperarCamposTabla("cliente");
-		int i = 0;
-		for (JComponent componente : view.contentPaneForm.componentes) {
-
-			if (componente instanceof JTextField) {
-				
-				JTextField textField = (JTextField) componente;
-				
-				if (!campos[i].equals("ud")) {
-					
-					textField.setEditable(true);
-					
+			if (filaSeleccionada != -1) {
+				int i = 0;
+				for (JComponent componente : view.contentPaneForm.componentes) {
+					if (componente instanceof JTextField) {
+						JTextField textField = (JTextField) componente;
+						String text = "";
+						if (view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i) instanceof Integer) {
+							text = Integer
+									.toString((int) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i));
+						} else {
+							text = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
+						}
+						textField.setText(text);
+					} else if (componente instanceof JDateChooser) {
+						JDateChooser dateChooser = (JDateChooser) componente;
+						SimpleDateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
+						String date = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
+						try {
+							dateChooser.setDate(formato.parse(date));
+						} catch (ParseException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+					i++;
 				}
 
-			} else if (componente instanceof JDateChooser) {
-				
-				JDateChooser dateChooser = (JDateChooser) componente;
-				dateChooser.setFocusable(true);
-
+			} else {
+				JOptionPane.showMessageDialog(view, "Ninguna fila seleccionada");
 			}
-			
-			i++;
-			
 		}
-	}
+	};
+
+	ActionListener editarRegistro = new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String arrayContenido[] = utg.agruparContenido();
+			Cliente cli = crearCliente(arrayContenido);
+
+			if (cli != null) {
+				String condition = "id=" + cli.getId();
+				mysql.actualizarDatos("cliente", cli.toStringUpdate(), condition);
+				crearTabla();
+				utg.limpiarCampos();
+				cli = null;
+			} else {
+				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
+			}
+		}
+	};
+
+	ActionListener eliminar = new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			view.contentPaneForm.botonGuardar
+					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
+			view.contentPaneForm.botonGuardar.setText("eliminar");
+			view.contentPaneForm.botonGuardar.addActionListener(eliminarRegistro);
+			utg.bloquerFormulario();
+
+			int filaSeleccionada = view.contentPaneRegistros.table.getSelectedRow();
+
+			if (filaSeleccionada != -1) {
+				int i = 0;
+				for (JComponent componente : view.contentPaneForm.componentes) {
+					if (componente instanceof JTextField) {
+						JTextField textField = (JTextField) componente;
+						String text = "";
+						if (view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i) instanceof Integer) {
+							text = Integer
+									.toString((int) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i));
+						} else {
+							text = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
+						}
+						textField.setText(text);
+					} else if (componente instanceof JDateChooser) {
+						JDateChooser dateChooser = (JDateChooser) componente;
+						SimpleDateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
+						String date = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
+						try {
+							dateChooser.setDate(formato.parse(date));
+						} catch (ParseException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+					i++;
+				}
+
+			} else {
+				JOptionPane.showMessageDialog(view, "Ninguna fila seleccionada");
+			}
+		}
+	};
+
+	ActionListener eliminarRegistro = new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String arrayContenido[] = utg.agruparContenido();
+			Cliente cli = crearCliente(arrayContenido);
+			int opcion = JOptionPane.showConfirmDialog(null, "¿Deseas eliminar el registro?", "Confirmación",
+					JOptionPane.YES_NO_OPTION);
+			boolean respuestaUsuario = opcion == JOptionPane.YES_OPTION;
+
+			if (cli != null && respuestaUsuario) {
+				String condition = "id=" + cli.getId();
+				mysql.actualizarDatos("cliente", cli.toStringUpdate(), condition);
+				crearTabla();
+				utg.limpiarCampos();
+				cli = null;
+			} else {
+				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
+			}
+
+		}
+	};
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
