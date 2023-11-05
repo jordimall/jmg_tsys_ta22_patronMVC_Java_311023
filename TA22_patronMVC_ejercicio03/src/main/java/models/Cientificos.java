@@ -9,7 +9,7 @@ package models;
 public class Cientificos {
 
 	private String DNI;
-	private String NomApels;
+	private String NomAples;
 
 	/**
 	 * @return the dNI
@@ -22,7 +22,7 @@ public class Cientificos {
 	 * @return the nomApels
 	 */
 	public String getNomApels() {
-		return NomApels;
+		return NomAples;
 	}
 
 	/**
@@ -36,16 +36,16 @@ public class Cientificos {
 	 * @param nomApels the nomApels to set
 	 */
 	public void setNomApels(String nomApels) {
-		NomApels = nomApels;
+		NomAples = nomApels;
 	}
 
 	
 	public String toStringAdd() {
-		return "\"" + DNI + "\", \"" + NomApels + "\"";
+		return "\"" + DNI + "\", \"" + NomAples + "\"";
 	}
 	
 	public String toStringUpdate() {
-		return "DNI=\"" + DNI + "\", NomApels=\"" + NomApels + "\"";
+		return "DNI=\"" + DNI + "\", NomAples=\"" + NomAples + "\"";
 	}
 
 }

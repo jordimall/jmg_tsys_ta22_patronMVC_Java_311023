@@ -8,8 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -20,80 +18,79 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-import com.toedter.calendar.JDateChooser;
-
+import models.Asignado_a;
 import models.MySQL;
 import models.User;
-import models.Videos;
 import utils.UtilsGeneral;
 import utils.UtilsMysql;
-import utils.utilsValidatorsForm;
 import views.ViewPrincipal;
 
 /**
  * 
  */
-public class VideosController {
-	private Videos videos;
+public class AsignadoAController {
+	private Asignado_a asignado;
 	private ViewPrincipal view;
 	private UtilsMysql mysql;
-	private utilsValidatorsForm validators = new utilsValidatorsForm();
 	private UtilsGeneral utg;
-	private String contentTable = "id INT(11) AUTO_INCREMENT, title VARCHAR(250) DEFAULT NULL,"
-			+ "director VARCHAR(250) DEFAULT NULL, cli_id INT(11) DEFAULT NULL, PRIMARY KEY (id),"
-			+ " CONSTRAINT videos_fk FOREIGN KEY (cli_id) REFERENCES cliente (id)";
+	private String nameTable = "asignado_a";
+	private String contentTable = "Cientifico VARCHAR(8), Proyecto char(4), PRIMARY KEY (Cientifico, Proyecto),"
+			+ "CONSTRAINT cientifico_fk FOREIGN KEY (Cientifico) REFERENCES cientificos (DNI),"
+			+ "CONSTRAINT proyecto_fk FOREIGN KEY (Proyecto) REFERENCES proyecto (Id)";
 
 	/**
-	 * @param client
+	 * @param proyecto
 	 * @param view
+	 * @param mysql
+	 * @param utg
 	 */
-	public VideosController(Videos videos, ViewPrincipal view, User user, MySQL mysql) {
-		this.videos = videos;
+	public AsignadoAController(Asignado_a asignado, ViewPrincipal view, User user, MySQL mysql) {
+		this.asignado = asignado;
 		this.view = view;
 		this.utg = new UtilsGeneral(view);
 		this.mysql = new UtilsMysql(mysql, user);
+		this.mysql.crearBaseDatos();
+		this.mysql.crearTabla(nameTable, contentTable);
+		this.view.btnAsignadoA.addActionListener(modificarTablaForm);
 	}
 
 	public void iniciarController() {
 		this.mysql.crearBaseDatos();
-		this.mysql.crearTabla("videos", contentTable);
-		this.view.btnvideos.addActionListener(modificarTablaForm);
+		this.mysql.crearTabla(nameTable, contentTable);
+
 	}
 
 	private void crearTabla() {
 		crearColumnas();
-		mostrarRegistro();
+		mostrarProyectos();
 	}
 
 	private void crearColumnas() {
 
-		String columnas[] = recuperarCamposTabla("videos");
+		String columnas[] = recuperarCamposTabla(nameTable);
 		DefaultTableModel model = new DefaultTableModel();
 
 		for (int i = 0; i < columnas.length; i++) {
 			if (columnas[i] != null) {
-				if (columnas[i].equals("cli_id")) {
-					model.addColumn("cliente");
-				} else {
-					model.addColumn(columnas[i]);
-				}
+				model.addColumn(columnas[i]);
 			}
 		}
 		view.contentPaneRegistros.table.setModel(model);
 	}
 
-	private void mostrarRegistro() {
+	private void mostrarProyectos() {
 		@SuppressWarnings("unchecked")
-		List<Videos> videos = (List<Videos>) mysql.RecuperarTodosLosDatos("videos", this.videos.getClass());
+		List<Asignado_a> asignados = (List<Asignado_a>) mysql.RecuperarTodosLosDatos(nameTable,
+				this.asignado.getClass());
 		DefaultTableModel model = (DefaultTableModel) view.contentPaneRegistros.table.getModel();
-		for (Videos video : videos) {
-			Object[] rowData = { video.getId(), video.getTitle(), video.getDirector(), video.getCli_id() };
+		for (Asignado_a asignado : asignados) {
+			Object[] rowData = { asignado.getCientifico(), asignado.getProyecto() };
 			model.addRow(rowData);
 		}
 	}
 
 	private void crearFormulario() {
-		String campos[] = recuperarCamposTabla("videos");
+		String campos[] = recuperarCamposTabla(nameTable);
 
 		view.contentPaneForm.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -105,19 +102,20 @@ public class VideosController {
 			if (campo != null) {
 				JLabel label = new JLabel(campo);
 
-				if (campo.equals("cli_id")) {
+				if (campo.equals("Cientifico")) {
 					JComboBox<String> combo = new JComboBox<String>();
-					List<String> valores = mysql.RecuperarTodosLosDatos("cliente", "id");
+					List<String> valores = mysql.RecuperarTodosLosDatos("cientificos", "DNI");
 					for (String valor : valores) {
 						combo.addItem(valor);
 					}
 					component = combo;
 				} else {
-					JTextField textField = new JTextField(20);
-					if (label.getText().equals("id")) {
-						textField.setEditable(false);
+					JComboBox<String> combo = new JComboBox<String>();
+					List<String> valores = mysql.RecuperarTodosLosDatos("proyecto", "Id");
+					for (String valor : valores) {
+						combo.addItem(valor);
 					}
-					component = textField;
+					component = combo;
 				}
 
 				gbc.gridx = 0;
@@ -137,7 +135,7 @@ public class VideosController {
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.CENTER;
 		view.contentPaneForm.add(view.contentPaneForm.botonGuardar, gbc);
-		view.lblTabla.setText("Tabla Videos");
+
 		view.contentPaneForm.revalidate();
 		view.contentPaneForm.repaint();
 
@@ -148,32 +146,13 @@ public class VideosController {
 		return campos;
 	}
 
-	private Videos crearVideo(String[] arrayList) {
-		Videos vid = new Videos();
+	private Asignado_a crearRegistro(String[] arrayList) {
+		Asignado_a asig = new Asignado_a();
 
-		if (!arrayList[0].isEmpty()) {
-			vid.setId(Integer.parseInt(arrayList[0]));
-		}
+		asig.setCientifico(arrayList[0]);
+		asig.setProyecto(arrayList[1]);
 
-		if (validators.validarMaxCaracteres(arrayList[1], 255) && validators.validarNoCadenaVacia(arrayList[1])) {
-			vid.setTitle(arrayList[1]);
-		} else {
-			JOptionPane.showMessageDialog(view,
-					"Error al validar el titulo, el campo no ha de estar vació y a de tener un maximo de 255 caracteres");
-			return null;
-		}
-
-		if (validators.validarMaxCaracteres(arrayList[2], 255) && validators.validarNoCadenaVacia(arrayList[2])) {
-			vid.setDirector(arrayList[2]);
-		} else {
-			JOptionPane.showMessageDialog(view,
-					"Error al validar el director, el campo no ha de estar vació y a de tener un maximo de 255 caracteres");
-			return null;
-		}
-
-		vid.setCli_id(Integer.parseInt(arrayList[3]));
-
-		return vid;
+		return asig;
 	}
 
 	ActionListener modificarTablaForm = new ActionListener() {
@@ -192,6 +171,7 @@ public class VideosController {
 			view.editarRegistro.addActionListener(editar);
 			view.eliminarRegistro.removeActionListener(view.eliminarRegistro.getActionListeners()[0]);
 			view.eliminarRegistro.addActionListener(eliminar);
+			view.lblTabla.setText("Tabla Asignado_a");
 
 			view.validate();
 			view.repaint();
@@ -210,17 +190,13 @@ public class VideosController {
 					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
 			view.contentPaneForm.botonGuardar.setText("Guardar");
 			view.contentPaneForm.botonGuardar.addActionListener(insertarRegistro);
-			utg.desbloquarFormulario(recuperarCamposTabla("videos"));
+			utg.desbloquarFormulario(recuperarCamposTabla(nameTable));
 
 			for (JComponent componente : view.contentPaneForm.componentes) {
 
-				if (componente instanceof JTextField) {
-					JTextField textField = (JTextField) componente;
-					textField.setText("");
-				} else if (componente instanceof JDateChooser) {
-					JDateChooser dateChooser = (JDateChooser) componente;
-					dateChooser.setDate(null);
-				}
+				JComboBox<?> combo = (JComboBox<?>) componente;
+				combo.setSelectedItem(null);
+
 			}
 		}
 	};
@@ -230,12 +206,13 @@ public class VideosController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String arrayContenido[] = utg.agruparContenido();
-			Videos vid = crearVideo(arrayContenido);
+			Asignado_a asig = crearRegistro(arrayContenido);
 
-			if (vid != null) {
-				mysql.insertarDatos("videos", vid.toStringAdd());
+			if (asig != null) {
+				mysql.insertarDatos(nameTable, asig.toStringAdd());
 				crearTabla();
 				utg.limpiarCampos();
+				asig = null;
 			} else {
 				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
 			}
@@ -254,32 +231,20 @@ public class VideosController {
 						.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
 				view.contentPaneForm.botonGuardar.setText("editar");
 				view.contentPaneForm.botonGuardar.addActionListener(editarRegistro);
-				utg.desbloquarFormulario(recuperarCamposTabla("videos"));
+				utg.desbloquarFormulario(recuperarCamposTabla(nameTable));
 
 				int i = 0;
 				for (JComponent componente : view.contentPaneForm.componentes) {
-					if (componente instanceof JTextField) {
-						JTextField textField = (JTextField) componente;
-						String text = "";
-						if (view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i) instanceof Integer) {
-							text = Integer
-									.toString((int) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i));
-						} else {
-							text = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
-						}
-						textField.setText(text);
-					} else if (componente instanceof JDateChooser) {
-						JDateChooser dateChooser = (JDateChooser) componente;
-						SimpleDateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
-						String date = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
-						try {
-							dateChooser.setDate(formato.parse(date));
-						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
+
+					String text = "";
+
+					text = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
+
+					JComboBox<?> combo = (JComboBox<?>) componente;
+					combo.setSelectedItem(text);
+
 					i++;
+
 				}
 
 			} else {
@@ -293,14 +258,14 @@ public class VideosController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String arrayContenido[] = utg.agruparContenido();
-			Videos vis = crearVideo(arrayContenido);
+			Asignado_a asig = crearRegistro(arrayContenido);
 
-			if (vis != null) {
-				String condition = "id=" + vis.getId();
-				mysql.actualizarDatos("videos", vis.toStringUpdate(), condition);
+			if (asig != null) {
+				String condition = "Cientifico=" + asig.getCientifico() + " AND Proyecto=" + asig.getProyecto();
+				mysql.actualizarDatos(nameTable, asig.toStringUpdate(), condition);
 				crearTabla();
 				utg.limpiarCampos();
-				vis = null;
+				asig = null;
 			} else {
 				JOptionPane.showMessageDialog(view, "Error al editar el campo");
 			}
@@ -323,27 +288,14 @@ public class VideosController {
 
 				int i = 0;
 				for (JComponent componente : view.contentPaneForm.componentes) {
-					if (componente instanceof JTextField) {
-						JTextField textField = (JTextField) componente;
-						String text = "";
-						if (view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i) instanceof Integer) {
-							text = Integer
-									.toString((int) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i));
-						} else {
-							text = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
-						}
-						textField.setText(text);
-					} else if (componente instanceof JDateChooser) {
-						JDateChooser dateChooser = (JDateChooser) componente;
-						SimpleDateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
-						String date = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
-						try {
-							dateChooser.setDate(formato.parse(date));
-						} catch (ParseException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
+
+					JTextField textField = (JTextField) componente;
+					String text = "";
+
+					text = (String) view.contentPaneRegistros.table.getValueAt(filaSeleccionada, i);
+
+					textField.setText(text);
+
 					i++;
 				}
 
@@ -358,19 +310,19 @@ public class VideosController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String arrayContenido[] = utg.agruparContenido();
-			Videos vid = crearVideo(arrayContenido);
+			Asignado_a asig = crearRegistro(arrayContenido);
 			int opcion = JOptionPane.showConfirmDialog(null, "¿Deseas eliminar el registro?", "Confirmación",
 					JOptionPane.YES_NO_OPTION);
 			boolean respuestaUsuario = opcion == JOptionPane.YES_OPTION;
 
-			if (vid != null && respuestaUsuario) {
-				String condition = "id=" + vid.getId();
-				mysql.eliminarDatos("videos", condition);
+			if (asig != null && respuestaUsuario) {
+				String condition = "Cientifico=" + asig.getCientifico() + " AND Proyecto=" + asig.getProyecto();
+				mysql.eliminarDatos(nameTable, condition);
 				crearTabla();
 				utg.limpiarCampos();
-				vid = null;
+				asig = null;
 			} else {
-				JOptionPane.showMessageDialog(view, "Error al eliminar el campo");
+				JOptionPane.showMessageDialog(view, "Error al insertar el campo");
 			}
 
 		}

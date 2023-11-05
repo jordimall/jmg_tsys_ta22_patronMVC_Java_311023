@@ -17,8 +17,9 @@ public class ViewPrincipal extends JFrame {
 	public JButton añadirRegistro;
 	public JButton editarRegistro;
 	public JButton eliminarRegistro;
-	public JButton btnvideos;
-	public JButton btnCliente;
+	public JButton btnProyecto;
+	public JButton btnCientifico;
+	public JButton btnAsignadoA;
 	public JLabel lblTabla;
 	public ViewMostrarRegistros contentPaneRegistros;
 	public ViewForm contentPaneForm;
@@ -39,18 +40,22 @@ public class ViewPrincipal extends JFrame {
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		contentPane.add(lblNewLabel);
 		
-		lblTabla = new JLabel("Tabla Cliente");
+		lblTabla = new JLabel("Tabla Cientificos");
 		lblTabla.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTabla.setBounds(37, 11, 140, 25);
 		contentPane.add(lblTabla);
 		
-		btnvideos = new JButton("Videos");
-		btnvideos.setBounds(10, 60, 89, 23);
-		contentPane.add(btnvideos);
+		btnCientifico = new JButton("Cientificos");
+		btnCientifico.setBounds(10, 60, 100, 23);
+		contentPane.add(btnCientifico);
 		
-		btnCliente = new JButton("Cliente");
-		btnCliente.setBounds(110, 60, 89, 23);
-		contentPane.add(btnCliente);
+		btnProyecto = new JButton("Proyecto");
+		btnProyecto.setBounds(130, 60, 100, 23);
+		contentPane.add(btnProyecto);
+		
+		btnAsignadoA = new JButton("Asignado a");
+		btnAsignadoA.setBounds(250, 60, 100, 23);
+		contentPane.add(btnAsignadoA);
 		
 		añadirRegistro = new JButton("A\u00F1adir");
 		añadirRegistro.setBounds(490, 60, 100, 25);
