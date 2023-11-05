@@ -3,6 +3,8 @@
  */
 package models;
 
+import utils.utilsValidatorsForm;
+
 /**
  * 
  */
@@ -13,6 +15,7 @@ public class Cliente {
 	private String direccion;
 	private int dni;
 	private String fecha;
+	private utilsValidatorsForm validators = new utilsValidatorsForm();
 
 	/**
 	 * @return the id
@@ -98,11 +101,13 @@ public class Cliente {
 		this.fecha = fecha;
 	}
 
-	@Override
-	public String toString() {
-		return "\""+nombre + "\", \"" + apellido + "\", \"" + direccion
-				+ "\", " + dni + ", \"" + fecha+ "\"";
+	public String toStringAdd() {
+		return "\"" + nombre + "\", \"" + apellido + "\", \"" + direccion + "\", " + dni + ", \"" + fecha + "\"";
 	}
-	
-	
+
+	public String toStringUpdate() {
+		return "nombre=\"" + nombre + "\", apellido=\"" + apellido + "\", direccion=\"" + direccion + "\", dni=" + dni
+				+ ", fecha=\"" + fecha + "\"";
+	}
+
 }

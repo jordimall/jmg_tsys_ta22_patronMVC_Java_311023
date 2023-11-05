@@ -6,12 +6,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JTextField;
-import javax.swing.JFormattedTextField;
 
 
 public class ViewPrincipal extends JFrame {
@@ -19,11 +16,11 @@ public class ViewPrincipal extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	public JButton añadirRegistro;
-	public JButton editarCliente;
-	public JButton eliminarCliente;
-	public JButton mostrarClientes;
+	public JButton editarRegistro;
+	public JButton eliminarRegistro;
 	public ViewMostrarRegistros contentPaneRegistros;
 	public ViewForm contentPaneForm;
+	private JTextField textField;
 
 	/**
 	 * Create the frame.
@@ -45,6 +42,14 @@ public class ViewPrincipal extends JFrame {
 		añadirRegistro.setBounds(375, 61, 150, 25);
 		contentPane.add(añadirRegistro);
 		
+		editarRegistro = new JButton("Modificar Registro");
+		editarRegistro.setBounds(189, 61, 150, 25);
+		contentPane.add(editarRegistro);
+		
+		eliminarRegistro = new JButton("Eliminar Registro");
+		eliminarRegistro.setBounds(29, 62, 150, 25);
+		contentPane.add(eliminarRegistro);
+		
 		contentPaneRegistros = new ViewMostrarRegistros();
 		contentPaneRegistros.scrollPane.setSize(450, 430);
 		contentPaneRegistros.scrollPane.setLocation(10, 10);
@@ -56,8 +61,7 @@ public class ViewPrincipal extends JFrame {
 		contentPaneForm.setSize(300, 430);
 		contentPaneForm.setLocation(500, 90);
 		contentPaneForm.setVisible(true);
-		contentPane.add(contentPaneForm);
-	    
+		contentPane.add(contentPaneForm);    
 	   
 	}
 }

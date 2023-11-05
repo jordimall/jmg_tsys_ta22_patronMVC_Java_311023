@@ -20,11 +20,11 @@ public class UtilsMysql {
 	private MySQL mysql;
 	private User user;
 	private String dataBase = "TA22";
-	
+
 	public UtilsMysql(MySQL mySQL, User user) {
-        this.mysql = mySQL;
-        this.user = user;
-    }
+		this.mysql = mySQL;
+		this.user = user;
+	}
 
 	public String iniciarSessionBaseDatos() {
 
@@ -46,8 +46,8 @@ public class UtilsMysql {
 			message = "Base de datos " + nameDatabase + " creada";
 		} else {
 			message = "Error al crear la base de datos " + nameDatabase;
-		} 
-		
+		}
+
 		return message;
 	}
 
@@ -62,9 +62,20 @@ public class UtilsMysql {
 		return message;
 	}
 
-	public String insertarDatos(String nameTable, String contentTable) {
+	public String insertarDatos(String nameTable, String contentInsert) {
 		String message = "";
-		boolean condition = mysql.insertsData(this.dataBase, nameTable, contentTable);
+		boolean condition = mysql.insertsData(this.dataBase, nameTable, contentInsert);
+		if (condition) {
+			message = "Datos insertados correctamente";
+		} else {
+			message = "Error al insertar los datos";
+		}
+		return message;
+	}
+
+	public String actualizarDatos(String nameTable, String contentUpdate, String conditionUpdate) {
+		String message = "";
+		boolean condition = mysql.update(dataBase, nameTable, contentUpdate, conditionUpdate);
 		if (condition) {
 			message = "Datos insertados correctamente";
 		} else {
@@ -102,9 +113,9 @@ public class UtilsMysql {
 			String columnas[] = new String[metaData.getColumnCount()];
 
 			for (int i = 1; i <= metaData.getColumnCount(); i++) {
-				if (!metaData.isAutoIncrement(i)) {
-					columnas[i - 1] = metaData.getColumnName(i);
-				}
+
+				columnas[i - 1] = metaData.getColumnName(i);
+
 			}
 
 			return columnas;
@@ -130,13 +141,11 @@ public class UtilsMysql {
 				for (int i = 1; i <= numColumnas; i++) {
 					String columnName = metaData.getColumnName(i);
 					Field field = type.getDeclaredField(columnName);
-					if(field != null) {
+					if (field != null) {
 						field.setAccessible(true);
 
 						Object value = resultSet.getObject(i);
 
-						// Verificar si el campo es de tipo Date y convertirlo a String antes de
-						// asignarlo
 						if (value instanceof Date && field.getType().equals(String.class)) {
 							SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 							String stringValue = dateFormat.format(value);
