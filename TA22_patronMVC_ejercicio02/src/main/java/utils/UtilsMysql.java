@@ -24,7 +24,7 @@ public class UtilsMysql {
 		this.mysql = mySQL;
 		this.user = user;
 	}
-	
+
 	public void iniciarSession() {
 		mysql.connectionSQL(user.getPassword(), user.getUserName());
 	}
@@ -96,9 +96,9 @@ public class UtilsMysql {
 		List<T> results = new ArrayList<>();
 		iniciarSessionBaseDatos();
 		ResultSet resultSet = mysql.getValues(this.dataBase, tabla);
-		
+
 		try {
-			
+
 			ResultSetMetaData metaData = resultSet.getMetaData();
 
 			int numColumnas = metaData.getColumnCount();
@@ -126,7 +126,7 @@ public class UtilsMysql {
 
 				results.add(obj);
 			}
-			
+
 			cerrarSesion();
 
 		} catch (SQLException | ReflectiveOperationException e) {
@@ -137,4 +137,74 @@ public class UtilsMysql {
 		return results;
 
 	}
+
+	public List<String> RecuperarTodosLosDatos(String tabla, String camposBuscar) {
+		List<String> results = new ArrayList<>();
+		iniciarSessionBaseDatos();
+		ResultSet resultSet = mysql.getEspecificValues(this.dataBase, tabla, camposBuscar);
+
+		try {
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			int numColumnas = metaData.getColumnCount();
+
+			while (resultSet.next()) {
+				StringBuilder rowData = new StringBuilder();
+
+				for (int i = 1; i <= numColumnas; i++) {
+					Object value = resultSet.getObject(i);
+
+					rowData.append(value).append(", ");
+
+				}
+
+				// Eliminar la última coma y espacio adicionales y agregar la fila a la lista de
+				// resultados
+				if (rowData.length() > 0) {
+					rowData.setLength(rowData.length() - 2); // Eliminar la última coma y espacio
+				}
+
+				results.add(rowData.toString());
+			}
+
+			cerrarSesion();
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			JOptionPane.showMessageDialog(null, "Error en la adquisición de datos");
+		}
+
+		return results;
+	}
+
+	public String RecuperarDato(String tabla, String camposBuscar, String condicion) {
+		String results = "";
+		iniciarSessionBaseDatos();
+		ResultSet resultSet = mysql.getEspecificValues(this.dataBase, tabla, camposBuscar, condicion);
+
+		try {
+
+			StringBuilder rowData = new StringBuilder();
+
+			Object value = resultSet.getObject(0);
+
+			rowData.append(value).append(", ");
+
+			// Eliminar la última coma y espacio adicionales y agregar la fila a la lista de
+			// resultados
+			if (rowData.length() > 0) {
+				rowData.setLength(rowData.length() - 2); // Eliminar la última coma y espacio
+			}
+
+			results = rowData.toString();
+
+			cerrarSesion();
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			JOptionPane.showMessageDialog(null, "Error en la adquisición de datos");
+		}
+
+		return results;
+	}
+
 }

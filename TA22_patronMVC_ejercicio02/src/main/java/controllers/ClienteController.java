@@ -54,6 +54,7 @@ public class ClienteController implements ActionListener {
 		this.view.añadirRegistro.addActionListener(añadir);
 		this.view.editarRegistro.addActionListener(editar);
 		this.view.eliminarRegistro.addActionListener(eliminar);
+		this.view.btnCliente.addActionListener(modificarTablaForm);
 
 	}
 
@@ -139,6 +140,9 @@ public class ClienteController implements ActionListener {
 		gbc.gridwidth = 2;
 		gbc.anchor = GridBagConstraints.CENTER;
 		view.contentPaneForm.add(view.contentPaneForm.botonGuardar, gbc);
+		
+		view.contentPaneForm.revalidate();
+		view.contentPaneForm.repaint();
 
 	}
 
@@ -196,6 +200,33 @@ public class ClienteController implements ActionListener {
 
 		return cli;
 	}
+	
+	ActionListener modificarTablaForm = new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			view.contentPaneRegistros.table.setModel(new DefaultTableModel());
+			view.contentPaneForm.componentes.clear();
+			view.contentPaneForm.removeAll();
+			view.contentPaneForm.botonGuardar
+					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
+			view.contentPaneForm.botonGuardar.setText("guardar");
+			view.añadirRegistro.removeActionListener(view.añadirRegistro.getActionListeners()[0]);
+			view.añadirRegistro.addActionListener(añadir);
+			view.editarRegistro.removeActionListener(view.editarRegistro.getActionListeners()[0]);
+			view.editarRegistro.addActionListener(editar);
+			view.eliminarRegistro.removeActionListener(view.eliminarRegistro.getActionListeners()[0]);
+			view.eliminarRegistro.addActionListener(eliminar);
+			view.lblTabla.setText("Tabla Cliente");
+			
+			view.validate();
+			view.repaint();
+
+			crearTabla();
+			crearFormulario();
+
+		}
+	};
 
 	ActionListener añadir = new ActionListener() {
 
@@ -203,7 +234,7 @@ public class ClienteController implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			view.contentPaneForm.botonGuardar
 					.removeActionListener(view.contentPaneForm.botonGuardar.getActionListeners()[0]);
-			view.contentPaneForm.botonGuardar.setText("guardar");
+			view.contentPaneForm.botonGuardar.setText("Guardar");
 			view.contentPaneForm.botonGuardar.addActionListener(insertarRegistro);
 			utg.desbloquarFormulario(recuperarCamposTabla("cliente"));
 
@@ -361,7 +392,7 @@ public class ClienteController implements ActionListener {
 
 			if (cli != null && respuestaUsuario) {
 				String condition = "id=" + cli.getId();
-				mysql.actualizarDatos("cliente", cli.toStringUpdate(), condition);
+				mysql.eliminarDatos("cliente", condition);
 				crearTabla();
 				utg.limpiarCampos();
 				cli = null;
