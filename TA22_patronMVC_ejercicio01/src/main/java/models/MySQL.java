@@ -15,38 +15,38 @@ public class MySQL {
 
 	private Connection conexion;
 
-	public boolean connectionSQL(String password, String user) {
+	public void connectionSQL(String password, String user) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			this.conexion = DriverManager
 					.getConnection("jdbc:mysql://127.0.0.1:3306?useTimezone=true&serverTimezone=UTC", user, password);
-			return true;
 		} catch (SQLException | ClassNotFoundException e) {
-			System.out.println(e);
-			return false;
+			JOptionPane.showMessageDialog(null, "Error al conectarse al sistema de gestión de bases");
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
 
-	public boolean connectionSQL(String password, String user, String nameDatabase) {
+	public void connectionSQL(String password, String user, String nameDatabase) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			this.conexion = DriverManager.getConnection(
 					"jdbc:mysql://127.0.0.1:3306/" + nameDatabase + "?useTimezone=true&serverTimezone=UTC", user,
 					password);
-			return true;
+
 		} catch (SQLException | ClassNotFoundException e) {
-			System.out.println(e);
-			return false;
+			JOptionPane.showMessageDialog(null, "Error al conectarse a la base de datos: " + nameDatabase);
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
 
-	public boolean closeConnection() {
+	public void closeConnection() {
 		try {
 			this.conexion.close();
-			return true;
+
 		} catch (SQLException e) {
 			Logger.getLogger(MySQL.class.getName()).log(Level.SEVERE, null, e);
-			return false;
+			JOptionPane.showMessageDialog(null, "Error al desconectarse");
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
 
@@ -56,81 +56,52 @@ public class MySQL {
 			Statement stdb = this.conexion.createStatement();
 			stdb.executeUpdate(querydb);
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			System.out.println("Error conectando con la base de datos.");
+			JOptionPane.showMessageDialog(null, "Error al conectarse a la base de datos: " + nameDatabase);
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
 
-	public boolean createDB(String name) {
+	public void createDB(String name) {
 		try {
 			Statement st = this.conexion.createStatement();
 
 			String query = "CREATE DATABASE " + name;
 			st.executeUpdate(query);
 
-			return true;
-
 		} catch (SQLException e) {
 			Logger.getLogger(MySQL.class.getName()).log(Level.SEVERE, null, e);
-			return false;
+			JOptionPane.showMessageDialog(null, "Error al crear la base de datos: " + name);
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
 
-	public boolean dropDB(String name) {
-		try {
-			Statement st = this.conexion.createStatement();
-
-			String query = "DROP DATABASE IF EXISTS " + name;
-			st.executeUpdate(query);
-
-			return true;
-
-		} catch (SQLException e) {
-			Logger.getLogger(MySQL.class.getName()).log(Level.SEVERE, null, e);
-			return false;
-		}
-	}
-
-	public boolean createTable(String db, String nameTabla, String contenidoTabla) {
+	public void createTable(String db, String nameTabla, String contenidoTabla) {
 		try {
 			useDatabase(db);
 
 			String query = "CREATE TABLE " + nameTabla + "(" + contenidoTabla + ")";
 			Statement st = this.conexion.createStatement();
 			st.executeUpdate(query);
-			return true;
+
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
-			return false;
+			JOptionPane.showMessageDialog(null, "Error al crear la tabla: " + nameTabla);
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
 
-	public boolean dropTable(String db, String nameTabla) {
-		try {
-			useDatabase(db);
-
-			String query = "DROP TABLE " + nameTabla;
-			Statement st = this.conexion.createStatement();
-			st.executeUpdate(query);
-			return true;
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return false;
-		}
-	}
-
-	public boolean insertsData(String db, String nameTabla, String insert) {
+	public void insertsData(String db, String nameTabla, String insert) {
 		try {
 			useDatabase(db);
 			String query = "INSERT INTO " + nameTabla + " (" + consegirColumnas(db, nameTabla) + ") VALUES (" + insert
 					+ ");";
 			Statement st = this.conexion.createStatement();
 			st.executeUpdate(query);
-			return true;
+			JOptionPane.showMessageDialog(null, "Datos insertados correctamente");
 		} catch (SQLException e) {
-			
-			System.out.println(e.getMessage());
-			return false;
+
+			JOptionPane.showMessageDialog(null, "Error al insertar datos en la tabla: " + nameTabla);
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
 
@@ -144,37 +115,40 @@ public class MySQL {
 
 			return resultSet;
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			JOptionPane.showMessageDialog(null, "Error al recuperar datos en la tabla: " + nameTabla);
+			JOptionPane.showMessageDialog(null, e.getMessage());
 			return null;
 		}
 
 	}
 
-	public boolean deleteRecord(String db, String nameTabla, String condition) {
+	public void deleteRecord(String db, String nameTabla, String condition) {
 		try {
 			useDatabase(db);
 
 			String query = "DELETE FROM " + nameTabla + " WHERE " + condition + ";";
 			Statement st = this.conexion.createStatement();
 			st.executeUpdate(query);
-			return true;
+			JOptionPane.showMessageDialog(null, "Datos eliminados correctamente");
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return false;
+
+			JOptionPane.showMessageDialog(null, "Error al eliminar datos en la tabla: " + nameTabla);
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
-	
-	public boolean update(String db, String nameTabla, String update, String condition) {
+
+	public void update(String db, String nameTabla, String update, String condition) {
 		try {
 			useDatabase(db);
 
-			String query = "UPDATE " + nameTabla + " SET " + update + " WHERE " + condition ;
+			String query = "UPDATE " + nameTabla + " SET " + update + " WHERE " + condition;
 			Statement st = this.conexion.createStatement();
 			st.executeUpdate(query);
-			return true;
+			JOptionPane.showMessageDialog(null, "Datos modificados correctamente");
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return false;
+
+			JOptionPane.showMessageDialog(null, "Error al modificar datos en la tabla: " + nameTabla);
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
 
@@ -195,6 +169,7 @@ public class MySQL {
 
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
+			JOptionPane.showMessageDialog(null, "Error consultando la base de datos");
 			return null;
 		}
 	}
