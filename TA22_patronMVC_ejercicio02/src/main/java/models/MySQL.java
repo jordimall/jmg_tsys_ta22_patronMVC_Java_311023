@@ -121,6 +121,40 @@ public class MySQL {
 		}
 
 	}
+	
+	public ResultSet getEspecificValues(String db, String nameTabla, String select) {
+		try {
+
+			useDatabase(db);
+			String query = "SELECT "+ select +" FROM " + nameTabla;
+			Statement st = this.conexion.createStatement();
+			ResultSet resultSet = st.executeQuery(query);
+
+			return resultSet;
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, "Error al recuperar datos en la tabla: " + nameTabla);
+			JOptionPane.showMessageDialog(null, e.getMessage());
+			return null;
+		}
+
+	}
+	
+	public ResultSet getEspecificValues(String db, String nameTabla, String select, String condition) {
+		try {
+
+			useDatabase(db);
+			String query = "SELECT "+ select +" FROM " + nameTabla + " WHERE " + condition;
+			Statement st = this.conexion.createStatement();
+			ResultSet resultSet = st.executeQuery(query);
+
+			return resultSet;
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, "Error al recuperar datos en la tabla: " + nameTabla);
+			JOptionPane.showMessageDialog(null, e.getMessage());
+			return null;
+		}
+
+	}
 
 	public void deleteRecord(String db, String nameTabla, String condition) {
 		try {
@@ -142,6 +176,7 @@ public class MySQL {
 			useDatabase(db);
 
 			String query = "UPDATE " + nameTabla + " SET " + update + " WHERE " + condition;
+			System.out.println(query);
 			Statement st = this.conexion.createStatement();
 			st.executeUpdate(query);
 			JOptionPane.showMessageDialog(null, "Datos modificados correctamente");

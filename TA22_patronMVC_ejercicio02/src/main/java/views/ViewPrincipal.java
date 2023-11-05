@@ -8,6 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 
 public class ViewPrincipal extends JFrame {
@@ -17,6 +19,9 @@ public class ViewPrincipal extends JFrame {
 	public JButton añadirRegistro;
 	public JButton editarRegistro;
 	public JButton eliminarRegistro;
+	public JButton btnvideos;
+	public JButton btnCliente;
+	public JLabel lblTabla;
 	public ViewMostrarRegistros contentPaneRegistros;
 	public ViewForm contentPaneForm;
 
@@ -35,6 +40,19 @@ public class ViewPrincipal extends JFrame {
 		lblNewLabel.setBounds(340, 0, 220, 50);
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		contentPane.add(lblNewLabel);
+		
+		lblTabla = new JLabel("Tabla Cliente");
+		lblTabla.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTabla.setBounds(37, 11, 140, 25);
+		contentPane.add(lblTabla);
+		
+		btnvideos = new JButton("Videos");
+		btnvideos.setBounds(10, 60, 89, 23);
+		contentPane.add(btnvideos);
+		
+		btnCliente = new JButton("Cliente");
+		btnCliente.setBounds(110, 60, 89, 23);
+		contentPane.add(btnCliente);
 		
 		añadirRegistro = new JButton("A\u00F1adir");
 		añadirRegistro.setBounds(490, 60, 100, 25);

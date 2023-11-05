@@ -16,6 +16,7 @@ public class App
         MySQL mysql = new MySQL();
         ViewPrincipal view = new ViewPrincipal();
         ClienteController cliCon = new ClienteController(cliente, view, user, mysql);
+        
         cliCon.iniciarVista();
     }
 }
