@@ -163,6 +163,20 @@ public class MySQL {
 			return false;
 		}
 	}
+	
+	public boolean update(String db, String nameTabla, String update, String condition) {
+		try {
+			useDatabase(db);
+
+			String query = "UPDATE " + nameTabla + " SET " + update + " WHERE " + condition ;
+			Statement st = this.conexion.createStatement();
+			st.executeUpdate(query);
+			return true;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
+	}
 
 	public ResultSetMetaData recuperarColumnas(String db, String nameTabla) {
 		try {
